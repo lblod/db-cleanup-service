@@ -19,7 +19,6 @@ const performAllCleanups = async function() {
   }
 };
 
-performAllCleanups();
 const isRunning = async function() {
   return false;
 };
