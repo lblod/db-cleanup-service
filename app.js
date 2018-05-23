@@ -5,7 +5,7 @@ import CleanupJob from './cleanup-job';
 import request from 'request';
 
 /** Schedule export cron job */
-const cronFrequency = process.env.PACKAGE_CRON_PATTERN || '*/30 * * * * *';
+const cronFrequency = process.env.CRON_PATTERN || '0 5 1 * * *';
 
 new CronJob(cronFrequency, function() {
   console.log(`cleanup triggered by cron job at ${new Date().toISOString()}`);
