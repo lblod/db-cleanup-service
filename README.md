@@ -55,7 +55,7 @@ Returns `202 Accepted` if the process was started
 ```
 services:
   dbcleanup:
-    image: semtech/mu-javascript-template:1.2.1
+    image: semtech/mu-javascript-template:1.3.1
     ports:
       - 8888:80
     environment:
