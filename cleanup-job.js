@@ -1,4 +1,8 @@
-import { query, update, sparqlEscapeUri} from 'mu';
+import { sparqlEscapeUri } from 'mu';
+import { querySudo as query, updateSudo as update } from './auth-sudo';
+
+const graph = process.env.MU_APPLICATION_GRAPH;
+
 class CleanupJob {
   constructor({id, title, uri, description, selectPattern, deletePattern}) {
     this.id = id;
@@ -27,7 +31,6 @@ class CleanupJob {
 
   async removeResource(resource) {
     await update(`
-          WITH <http://mu.semte.ch/application>
           DELETE {
             ${this.deletePattern}
           }
@@ -43,7 +46,6 @@ class CleanupJob {
   async matchingResources() {
     const result  = await query(`
       SELECT DISTINCT ?resource
-      FROM <http://mu.semte.ch/application>
       WHERE {
            ${this.selectPattern}
       }
@@ -58,7 +60,7 @@ class CleanupJob {
                            PREFIX mu: <http://mu.semte.ch/vocabularies/ext/cleanup/>
                            PREFIX dcterms: <http://purl.org/dc/terms/>
                            SELECT ?uri ?id ?title ?description ?selectPattern ?deletePattern
-                           FROM <http://mu.semte.ch/application>
+                           FROM <${graph}>
                            WHERE {
                                ?uri a cleanup:Job;
                                     mu:uuid ?id;
