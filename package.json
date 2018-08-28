@@ -1,6 +1,6 @@
 {
   "name": "db-cleanup-service",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "microservice that runs cleanup queries on the database at set intervals",
   "dependencies": {
     "cron": "^1.3.0",
