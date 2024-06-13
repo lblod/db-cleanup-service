@@ -3,6 +3,7 @@
   "version": "0.3.0",
   "description": "microservice that runs cleanup queries on the database at set intervals",
   "dependencies": {
+    "@lblod/mu-auth-sudo": "0.6.1",
     "cron": "^3.1.7",
     "request": "^2.88.2"
   },

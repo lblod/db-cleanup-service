@@ -1,5 +1,5 @@
 import { sparqlEscapeUri } from 'mu';
-import { querySudo as query, updateSudo as update } from './auth-sudo';
+import { querySudo as query, updateSudo as update } from '@lblod/mu-auth-sudo';
 
 const graph = process.env.MU_APPLICATION_GRAPH;
 
