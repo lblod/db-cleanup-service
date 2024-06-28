@@ -101,7 +101,7 @@ To set up a development environment, use the following configuration in `docker-
 ```yaml
 services:
   dbcleanup:
-    image: semtech/mu-javascript-template:1.3.1
+    image: semtech/mu-javascript-template:1.8.0
     ports:
       - 8888:80
     environment:
