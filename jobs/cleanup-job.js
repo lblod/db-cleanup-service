@@ -24,7 +24,7 @@ class CleanupJob {
 
   async execute() {
     console.log(`running cleanup job ${this.title} (${this.id})`);
-    
+
     let resources;
     try {
       resources = await this.matchingResources();
@@ -32,14 +32,14 @@ class CleanupJob {
       console.error('error fetching matching resources:', e);
       return;
     }
-  
+
     if (!resources || resources.length === 0) {
       console.warn('no resources were found');
       return;
     }
-  
+
     console.log(`found ${resources.length} matches to remove`);
-    
+
     for (let resource of resources) {
       try {
         console.log('removing resource:', resource);
@@ -49,18 +49,17 @@ class CleanupJob {
         console.error(e);
       }
     }
-  
+
     console.log('cleanup job done');
   }
-  
 
-/**
- * Remove a specific resource based on its URI.
- * @param {string} resource - URI of the resource to be deleted.
- */
-async removeResource(resource) {
-  try {
-    await update(`
+  /**
+   * Remove a specific resource based on its URI.
+   * @param {string} resource - URI of the resource to be deleted.
+   */
+  async removeResource(resource) {
+    try {
+      await update(`
       DELETE {
         ${this.deletePattern}
       }
@@ -68,56 +67,56 @@ async removeResource(resource) {
         ${this.selectPattern}
         FILTER(?resource = ${sparqlEscapeUri(resource)})
       }`);
-  } catch (e) {
-    console.error(`failed to remove resource ${resource}:`, e);
-    throw e;
+    } catch (e) {
+      console.error(`failed to remove resource ${resource}:`, e);
+      throw e;
+    }
   }
-}
 
-
-/**
- * Retrieve resources to be deleted.
- * @returns {Promise<string[]>} - A promise that resolves to an array of resource URIs.
- */
-async matchingResources() {
-  try {
-    const result = await query(`
+  /**
+   * Retrieve resources to be deleted.
+   * @returns {Promise<string[]>} - A promise that resolves to an array of resource URIs.
+   */
+  async matchingResources() {
+    try {
+      const result = await query(`
       SELECT DISTINCT ?resource
       WHERE {
         ${this.selectPattern}
       }
     `);
 
-    const bindingKeys = result.head.vars;
-    if (!bindingKeys.includes('resource')) {
-      throw new Error('the query did not return the expected "resource" binding.');
+      const bindingKeys = result.head.vars;
+      if (!bindingKeys.includes('resource')) {
+        throw new Error(
+          'the query did not return the expected "resource" binding.'
+        );
+      }
+
+      return result.results.bindings.map((r) => r.resource.value);
+    } catch (e) {
+      console.error('failed to retrieve matching resources:', e);
+      throw e;
     }
-
-    return result.results.bindings.map(r => r.resource.value);
-  } catch (e) {
-    console.error('failed to retrieve matching resources:', e);
-    throw e;
   }
-}
-
 
   static async findAll() {
     const result = await query(`
-                           PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
-                           PREFIX mu: <http://mu.semte.ch/vocabularies/ext/cleanup/>
-                           PREFIX dcterms: <http://purl.org/dc/terms/>
-                           SELECT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern
-                           FROM <${graph}>
-                           WHERE {
-                               ?uri a cleanup:Job;
-                                    mu:uuid ?id;
-                                    dcterms:title ?title;
-                                    cleanup:selectPattern ?selectPattern;
-                                    cleanup:deletePattern ?deletePattern.
-                               OPTIONAL {?uri dcterms:description ?description.}
-                               OPTIONAL {?uri cleanup:cronPattern ?cronPattern.}
-                           }
-                   `);
+    PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
+    PREFIX mu: <http://mu.semte.ch/vocabularies/ext/cleanup/>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern
+    FROM <${graph}>
+    WHERE {
+      ?uri a cleanup:Job;
+        mu:uuid ?id;
+        dcterms:title ?title;
+        cleanup:selectPattern ?selectPattern;
+        cleanup:deletePattern ?deletePattern.
+      OPTIONAL {?uri dcterms:description ?description.}
+      OPTIONAL {?uri cleanup:cronPattern ?cronPattern.}
+    }
+    `);
     const bindingKeys = result.head.vars;
 
     return result.results.bindings.map((r) => {
