@@ -8,4 +8,3 @@ auto-save-list
 tramp
 .\#*
 node_modules/
-package-lock.json
