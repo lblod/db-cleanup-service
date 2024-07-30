@@ -108,7 +108,7 @@ class CleanupJob {
   static async findAll() {
     const result = await query(`
       PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
-      PREFIX mu:      <http://mu.semte.ch/vocabularies/ext/cleanup/>
+      PREFIX mu:      <http://mu.semte.ch/vocabularies/core/>
       PREFIX dcterms: <http://purl.org/dc/terms/>
 
       SELECT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern
