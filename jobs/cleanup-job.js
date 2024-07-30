@@ -60,6 +60,8 @@ class CleanupJob {
   async removeResource(resource) {
     try {
       await update(`
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
         DELETE {
           ${this.deletePattern}
         }
@@ -81,6 +83,8 @@ class CleanupJob {
   async matchingResources() {
     try {
       const result = await query(`
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
         SELECT DISTINCT ?resource
         WHERE {
           ${this.selectPattern}
