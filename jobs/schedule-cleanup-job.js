@@ -23,7 +23,7 @@ export default function scheduleCleanupJob(job) {
   cron.schedule(job.cronPattern, async () => {
     await lock.acquire();
     try {
-      await job.execute(); // 1 job at a time, being friendly to the database
+      await job.execute(); // 1 job at a time to not exhaust the database
     } catch (e) {
       console.error(
         new Error(

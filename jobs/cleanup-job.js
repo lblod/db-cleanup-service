@@ -60,13 +60,14 @@ class CleanupJob {
   async removeResource(resource) {
     try {
       await update(`
-      DELETE {
-        ${this.deletePattern}
-      }
-      WHERE {
-        ${this.selectPattern}
-        FILTER(?resource = ${sparqlEscapeUri(resource)})
-      }`);
+        DELETE {
+          ${this.deletePattern}
+        }
+        WHERE {
+          ${this.selectPattern}
+          FILTER(?resource = ${sparqlEscapeUri(resource)})
+        }
+      `);
     } catch (e) {
       console.error(`failed to remove resource ${resource}:`, e);
       throw e;
@@ -80,10 +81,10 @@ class CleanupJob {
   async matchingResources() {
     try {
       const result = await query(`
-      SELECT DISTINCT ?resource
-      WHERE {
-        ${this.selectPattern}
-      }
+        SELECT DISTINCT ?resource
+        WHERE {
+          ${this.selectPattern}
+        }
     `);
 
       const bindingKeys = result.head.vars;
@@ -102,20 +103,22 @@ class CleanupJob {
 
   static async findAll() {
     const result = await query(`
-    PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
-    PREFIX mu: <http://mu.semte.ch/vocabularies/ext/cleanup/>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern
-    FROM <${graph}>
-    WHERE {
-      ?uri a cleanup:Job;
-        mu:uuid ?id;
-        dcterms:title ?title;
-        cleanup:selectPattern ?selectPattern;
-        cleanup:deletePattern ?deletePattern.
-      OPTIONAL {?uri dcterms:description ?description.}
-      OPTIONAL {?uri cleanup:cronPattern ?cronPattern.}
-    }
+      PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
+      PREFIX mu:      <http://mu.semte.ch/vocabularies/ext/cleanup/>
+      PREFIX dcterms: <http://purl.org/dc/terms/>
+
+      SELECT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern
+      FROM <${graph}>
+      WHERE {
+        ?uri a cleanup:Job;
+          mu:uuid ?id;
+          dcterms:title ?title;
+          cleanup:selectPattern ?selectPattern;
+          cleanup:deletePattern ?deletePattern.
+
+        OPTIONAL {?uri dcterms:description ?description.}
+        OPTIONAL {?uri cleanup:cronPattern ?cronPattern.}
+      }
     `);
     const bindingKeys = result.head.vars;
 
