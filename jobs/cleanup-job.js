@@ -114,14 +114,14 @@ class CleanupJob {
       SELECT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern
       FROM <${graph}>
       WHERE {
-        ?uri a cleanup:Job;
-          mu:uuid ?id;
-          dcterms:title ?title;
-          cleanup:selectPattern ?selectPattern;
-          cleanup:deletePattern ?deletePattern.
+        ?uri a cleanup:Job ;
+          mu:uuid ?id ;
+          dcterms:title ?title ;
+          cleanup:selectPattern ?selectPattern ;
+          cleanup:deletePattern ?deletePattern .
 
-        OPTIONAL {?uri dcterms:description ?description.}
-        OPTIONAL {?uri cleanup:cronPattern ?cronPattern.}
+        OPTIONAL { ?uri dcterms:description ?description . }
+        OPTIONAL { ?uri cleanup:cronPattern ?cronPattern . }
       }
     `);
     const bindingKeys = result.head.vars;
