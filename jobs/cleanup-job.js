@@ -1,7 +1,13 @@
 import { sparqlEscapeUri } from 'mu';
 import { querySudo as query, updateSudo as update } from '@lblod/mu-auth-sudo';
+import * as env from '../env';
 
 const graph = process.env.MU_APPLICATION_GRAPH;
+
+const sparqlConnectionOptions = {
+  sparqlEndpoint: env.SPARQL_ENDPOINT_CLEANUP_OPERATIONS,
+  mayRetry: true,
+};
 
 class CleanupJob {
   constructor({
@@ -69,7 +75,9 @@ class CleanupJob {
           ${this.selectPattern}
           FILTER(?resource = ${sparqlEscapeUri(resource)})
         }
-      `);
+      `,
+      {},
+      sparqlConnectionOptions);
     } catch (e) {
       console.error(`failed to remove resource ${resource}:`, e);
       throw e;
