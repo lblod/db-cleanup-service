@@ -35,5 +35,7 @@ export default function scheduleCleanupJob(job) {
     } finally {
       lock.release();
     }
+  }, {
+    name: job.id
   });
 }
