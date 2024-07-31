@@ -31,8 +31,8 @@ app.post('/cleanup', async function( req, res, next ) {
 });
 
 /*
- * This is endpoint used to disable all scheduled cron jobs. It is needed
- * in case the jobs need to be updated or
+ * This is endpoint used to disable all scheduled cronjob. It can be useful
+ * if the cronjobs need to be updated or disabled based on requirements.
  */
 app.post('/disableCronjobs', async function( req, res, next ) {
   try {
@@ -42,6 +42,27 @@ app.post('/disableCronjobs', async function( req, res, next ) {
   catch(e) {
     console.error(e);
     return next(new Error(e.message));
+  }
+});
+
+/*
+ * This is the endpoint used to disable a single cronjob.
+ */
+app.get('/disableCronjob', async function ( req, res ) {
+  if (Object.keys(req.query || {}).length > 1 || Object.keys(req.query || {}).length === 0) {
+    return res.status(406).send(
+      {
+        message: `Only one parameter must be passed.`
+      }
+    );
+  }
+
+  if (req.query.cronJobID) {
+    console.log(`Cronjob to be disabled has the following ID: ${req.query.cronJobID}`);
+    const job = cron.getTasks().get(req.query.cronJobID);
+    job.stop();
+    console.log(`Cronjob with ID: ${req.query.cronJobID} has been disabled.`);
+    return res.status(200).send();
   }
 });
 
