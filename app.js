@@ -1,16 +1,7 @@
 import cron from 'node-cron';
 import { app, errorHandler } from 'mu';
 import CleanupJob from './jobs/cleanup-job';
-import fetch from 'node-fetch';
 import scheduleCleanupJob from './jobs/schedule-cleanup-job';
-
-/** Schedule export cron job */
-const cronFrequency = process.env.CRON_PATTERN || '0 5 1 * * *';
-
-cron.schedule(cronFrequency, function() {
-  console.log(`DB cleanup service triggered by cron job at ${new Date().toISOString()}`);
-  fetch('http://localhost/cleanup/', { method: 'POST'});
-});
 
 const performAllCleanups = async function() {
   const jobs = await CleanupJob.findAll();
@@ -28,7 +19,7 @@ const disableCronjobs = async function() {
   }
 }
 
-app.post('/cleanup/', async function( req, res, next ) {
+app.post('/cleanup', async function( req, res, next ) {
   try {
     await performAllCleanups();
     return res.status(202).send({status: 202, title: 'processing'});
