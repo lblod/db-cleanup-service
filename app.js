@@ -3,7 +3,7 @@ import { app, errorHandler } from 'mu';
 import CleanupJob from './jobs/cleanup-job';
 import scheduleCleanupJob from './jobs/schedule-cleanup-job';
 
-const performAllCleanups = async function() {
+const scheduleAllCleanups = async function() {
   const jobs = await CleanupJob.findAll();
   for (let job of jobs) {
     console.log(`Creating cronjob with ID: ${job.id}`);
@@ -21,7 +21,7 @@ const disableCronjobs = async function() {
 
 app.post('/cleanup', async function( req, res, next ) {
   try {
-    await performAllCleanups();
+    await scheduleAllCleanups();
     return res.status(202).send({status: 202, title: 'processing'});
   }
   catch(e) {
