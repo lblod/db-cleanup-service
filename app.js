@@ -22,7 +22,7 @@ const disableCronjobs = async function() {
 app.post('/cleanup', async function( req, res, next ) {
   try {
     await scheduleAllCleanups();
-    return res.status(202).send({status: 202, title: 'processing'});
+    return res.status(201).send();
   }
   catch(e) {
     console.error(e);
@@ -37,7 +37,7 @@ app.post('/cleanup', async function( req, res, next ) {
 app.post('/disableCronjobs', async function( req, res, next ) {
   try {
     await disableCronjobs();
-    return res.status(202).send({status: 202, title: 'processing'});
+    return res.status(200).send();
   }
   catch(e) {
     console.error(e);
