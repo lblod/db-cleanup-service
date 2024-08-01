@@ -9,16 +9,15 @@ To add the service to your stack, add the following snippet to `docker-compose.y
 ```yaml
 services:
   dbcleanup:
-    image: lblod/db-cleanup-service
+    image: lblod/db-cleanup-service:x.y.z
 ```
 
 ## Configuration
 
 The cleanup service will execute cleanup jobs that are specified in the SPARQL endpoint. Each job should have the type `cleanup:Job` and at least the following properties:
-
 - `mu:uuid`: an identifier for the job, typically the last part of its URI
 - `dcterms:title`: a title describing the job
-- `cleanup:selectPattern`: the pattern to match; resource to be deleted should be named `?resource`. This is used in COUNT queries and the cleanup query (a delete...where query)
+- `cleanup:selectPattern`: the pattern to match; resource to be deleted should be named `?resource`. This is used in COUNT queries and the cleanup query (a `DELETE...WHERE` query)
 - `cleanup:deletePattern`: the pattern to be deleted
 - `cleanup:cronPattern` (optional): a cron pattern to schedule the job execution. If not provided, the default pattern will be used.
 
@@ -28,32 +27,36 @@ For example:
 
 ```sparql
 PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
-PREFIX mu: <http://mu.semte.ch/vocabularies/ext/cleanup/>
+PREFIX mu:      <http://mu.semte.ch/vocabularies/ext/cleanup/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
 :job a cleanup:Job;
-     mu:uuid "10724bc2-c9d0-4a35-a499-91a8b7cb023b";
-     dcterms:title "clean up dangling file uploads";
-     cleanup:selectPattern """
-              GRAPH <http://mu.semte.ch/graphs/public> {
-              ?resource a <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#FileDataObject>;
-              ?p ?o;
-              <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#dataSource> ?source;
-              <http://purl.org/dc/terms/modified> ?modified.
-              ?source ?sourcep ?sourceo. }
-              BIND(NOW() - xsd:dayTimeDuration("P1D") AS ?oneDayAgo)
-              FILTER(?modified <= ?oneDayAgo)
-              FILTER(NOT EXISTS { ?foo <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#hasPart> ?resource})
-              """;
-     cleanup:deletePattern """
-              GRAPH <http://mu.semte.ch/graphs/public> {
-              ?resource ?p ?o.
-              ?source ?sourcep ?sourceo. }
-              """;
-     cleanup:cronPattern "0 0 * * *"; # Runs daily at midnight
+  mu:uuid "10724bc2-c9d0-4a35-a499-91a8b7cb023b";
+  dcterms:title "clean up dangling file uploads";
+  cleanup:selectPattern """
+    GRAPH <http://mu.semte.ch/graphs/public> {
+      ?resource a <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#FileDataObject> ;
+        <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#dataSource> ?source ;
+        <http://purl.org/dc/terms/modified> ?modified ;
+        ?p ?o .
+
+      ?source ?sourcep ?sourceo .
+
+      BIND(NOW() - xsd:dayTimeDuration("P1D") AS ?oneDayAgo)
+      FILTER(?modified <= ?oneDayAgo)
+      FILTER(NOT EXISTS { ?foo <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#hasPart> ?resource })
+    }
+    """;
+  cleanup:deletePattern """
+    GRAPH <http://mu.semte.ch/graphs/public> {
+      ?resource ?p ?o.
+      ?source ?sourcep ?sourceo.
+    }
+    """;
+  cleanup:cronPattern "0 0 * * *"; # Runs daily at midnight
 ```
 
-**Note that in each pattern a graph is specified, this is needed in order to run the query**
+**Note that a graph is specified in each pattern; this is needed in order to run the query.**
 
 ## Scheduling Feature
 
@@ -87,12 +90,34 @@ To ensure that only one cleanup job runs at a time and to prevent database confl
 
 ### POST /cleanup
 
-Trigger cleanup.
+Triggers the cleanup cronjobs.
 
 #### Response
 
-- `202 Accepted` if the process was started
-- `503 Service Unavailable` if the process is already running
+- `201 Created` if the process was started and cronjobs were created.
+
+### POST /disableCronjobs
+
+Disables all cronjobs that had been triggered at an earlier point in time.
+
+#### Response
+
+- `200 OK` if the cronjobs were disabled successfully.
+
+### GET /disableCronjob
+
+Disables a single cronjob.
+
+#### Parameters
+
+This GET call accepts only one parameter.
+
+- `cronjobID`: The call in this case would be `/disableCronjob?cronjobID=a53a0b8b-fdaf-41d5-a39b-20ddb3a36e6b`.
+
+#### Response
+
+- `406 Not Acceptable` if no or multiple parameters were passed.
+- `200 OK` if the cronjob was successfully disabled.
 
 ## Development
 
@@ -101,7 +126,7 @@ To set up a development environment, use the following configuration in `docker-
 ```yaml
 services:
   dbcleanup:
-    image: semtech/mu-javascript-template:1.8.0
+    image: lblod/db-cleanup-service:x.y.z
     ports:
       - 8888:80
     environment:
