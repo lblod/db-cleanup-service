@@ -6,7 +6,8 @@
     "@lblod/mu-auth-sudo": "0.6.1",
     "async-await-mutex-lock": "^1.0.11",
     "node-cron": "^3.0.3",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "env-var": "^7.4.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

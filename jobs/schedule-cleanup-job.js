@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { Lock } from 'async-await-mutex-lock';
 
-const defaultFrequency = process.env.CRON_PATTERN || '0 */1 * * *' ; // default every hour
+const defaultFrequency = process.env.CRON_PATTERN || '0 20 1 * *' ; // At 20:00 every first day of the month
 const lock = new Lock();
 
 /**
@@ -23,7 +23,7 @@ export default function scheduleCleanupJob(job) {
   cron.schedule(job.cronPattern, async () => {
     await lock.acquire();
     try {
-      await job.execute(); // 1 job at a time, being friendly to the database
+      await job.execute(); // 1 job at a time to not exhaust the database
     } catch (e) {
       console.error(
         new Error(
@@ -35,5 +35,7 @@ export default function scheduleCleanupJob(job) {
     } finally {
       lock.release();
     }
+  }, {
+    name: job.id
   });
 }
