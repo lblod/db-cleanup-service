@@ -1,7 +1,7 @@
 {
   "name": "db-cleanup-service",
-  "version": "0.3.0",
-  "description": "microservice that runs cleanup queries on the database at set intervals",
+  "version": "0.4.0",
+  "description": "Microservice that runs cleanup queries on the database at set intervals",
   "dependencies": {
     "@lblod/mu-auth-sudo": "0.6.1",
     "async-await-mutex-lock": "^1.0.11",
