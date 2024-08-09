@@ -27,7 +27,7 @@ For example:
 
 ```sparql
 PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
-PREFIX mu:      <http://mu.semte.ch/vocabularies/ext/cleanup/>
+PREFIX mu:      <http://mu.semte.ch/vocabularies/core/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
 :job a cleanup:Job;
@@ -53,7 +53,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
       ?source ?sourcep ?sourceo.
     }
     """;
-  cleanup:cronPattern "0 0 * * *"; # Runs daily at midnight
+  cleanup:cronPattern "0 0 * * *". # Runs daily at midnight
 ```
 
 **Note that a graph is specified in each pattern; this is needed in order to run the query.**
