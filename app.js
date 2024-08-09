@@ -2,11 +2,12 @@ import cron from 'node-cron';
 import { app, errorHandler } from 'mu';
 import CleanupJob from './jobs/cleanup-job';
 import scheduleCleanupJob from './jobs/schedule-cleanup-job';
+import { waitForDatabase } from './database-utils';
 
 const scheduleAllCleanups = async function() {
   const jobs = await CleanupJob.findAll();
   for (let job of jobs) {
-    console.log(`Creating cronjob with ID: ${job.id}`);
+    console.log(`Scheduling job with ID: ${job.id}, entitled: "${job.title}"`);
     scheduleCleanupJob(job);
   }
 };
@@ -17,7 +18,9 @@ const disableCronjobs = async function() {
     job.stop();
     console.log(`Stopped cronjob with ID: ${jobId}`);
   }
-}
+};
+
+waitForDatabase().then(scheduleAllCleanups);
 
 app.post('/cleanup', async function( req, res, next ) {
   try {
