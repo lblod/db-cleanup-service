@@ -119,7 +119,8 @@ class CleanupJob {
       PREFIX mu:      <http://mu.semte.ch/vocabularies/core/>
       PREFIX dcterms: <http://purl.org/dc/terms/>
 
-      SELECT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern
+      SELECT DISTINCT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern
+
       FROM <${graph}>
       WHERE {
         ?uri a cleanup:Job ;
