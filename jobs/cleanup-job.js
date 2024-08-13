@@ -120,7 +120,6 @@ class CleanupJob {
       PREFIX dcterms: <http://purl.org/dc/terms/>
 
       SELECT DISTINCT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern
-
       FROM <${graph}>
       WHERE {
         ?uri a cleanup:Job ;
