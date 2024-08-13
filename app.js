@@ -3,6 +3,7 @@ import { app, errorHandler } from 'mu';
 import CleanupJob from './jobs/cleanup-job';
 import scheduleCleanupJob from './jobs/schedule-cleanup-job';
 import { waitForDatabase } from './database-utils';
+import * as env from './env';
 
 const scheduleAllCleanups = async function() {
   const jobs = await CleanupJob.findAll();
@@ -20,7 +21,12 @@ const disableCronjobs = async function() {
   }
 };
 
-waitForDatabase().then(scheduleAllCleanups);
+// If a user wants the jobs to be scheduled as the service starts,
+// the service first checks if the database is online and proceeds to schedule
+// the cleanup jobs.
+if (env.SCHEDULE_ON_SERVICE_START) {
+  waitForDatabase().then(scheduleAllCleanups);
+}
 
 app.post('/cleanup', async function( req, res, next ) {
   try {

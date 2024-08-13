@@ -12,6 +12,14 @@ services:
     image: lblod/db-cleanup-service:x.y.z
 ```
 
+## Environment Variables
+
+| Name                        | Description                                                                   | Type      |
+| --------------------------- | ----------------------------------------------------------------------------- | ---------
+| `SPARQL_ENDPOINT`           | The endpoint that will receive SPARQL queries                                 | UrlString |
+| `PING_DB_INTERVAL`          | Interval (ms) to wait before pinging to confirm if the database is running    | Int       |
+| `SCHEDULE_ON_SERVICE_START` | Allows the cleanup jobs to be automatically scheduled when the service starts | Bool      |
+
 ## Configuration
 
 The cleanup service will execute cleanup jobs that are specified in the SPARQL endpoint. Each job should have the type `cleanup:Job` and at least the following properties:
