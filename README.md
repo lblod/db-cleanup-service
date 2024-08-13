@@ -38,9 +38,9 @@ PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
 PREFIX mu:      <http://mu.semte.ch/vocabularies/core/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
-:job a cleanup:Job;
-  mu:uuid "10724bc2-c9d0-4a35-a499-91a8b7cb023b";
-  dcterms:title "clean up dangling file uploads";
+:job a cleanup:Job ;
+  mu:uuid "10724bc2-c9d0-4a35-a499-91a8b7cb023b" ;
+  dcterms:title "clean up dangling file uploads" ;
   cleanup:selectPattern """
     GRAPH <http://mu.semte.ch/graphs/public> {
       ?resource a <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#FileDataObject> ;
@@ -54,14 +54,14 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
       FILTER(?modified <= ?oneDayAgo)
       FILTER(NOT EXISTS { ?foo <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#hasPart> ?resource })
     }
-    """;
+    """ ;
   cleanup:deletePattern """
     GRAPH <http://mu.semte.ch/graphs/public> {
-      ?resource ?p ?o.
-      ?source ?sourcep ?sourceo.
+      ?resource ?p ?o .
+      ?source ?sourcep ?sourceo .
     }
-    """;
-  cleanup:cronPattern "0 0 * * *". # Runs daily at midnight
+    """ ;
+  cleanup:cronPattern "0 0 * * *" . # Runs daily at midnight
 ```
 
 **Note that a graph is specified in each pattern; this is needed in order to run the query.**
