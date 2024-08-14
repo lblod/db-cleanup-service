@@ -67,11 +67,15 @@ app.get('/disableCronjob', async function ( req, res ) {
   }
 
   if (req.query.cronJobID) {
-    console.log(`Cronjob to be disabled has the following ID: ${req.query.cronJobID}`);
-    const job = cron.getTasks().get(req.query.cronJobID);
-    job.stop();
-    console.log(`Cronjob with ID: ${req.query.cronJobID} has been disabled.`);
-    return res.status(200).send();
+    if (cron.getTasks().has(req.query.cronJobID)) {
+      const job = cron.getTasks().get(req.query.cronJobID);
+      job.stop();
+      console.log(`Cronjob with ID: ${req.query.cronJobID} has been disabled.`);
+      return res.status(200).send();
+    } else {
+      console.error(`Cronjob with ID: ${req.query.cronJobID} does not exist.`);
+      return res.status(404).send();
+    }
   }
 });
 
