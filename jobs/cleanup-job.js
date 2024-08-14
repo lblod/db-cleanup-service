@@ -5,7 +5,7 @@ import * as env from '../env';
 const graph = process.env.MU_APPLICATION_GRAPH;
 
 const sparqlConnectionOptions = {
-  sparqlEndpoint: env.SPARQL_ENDPOINT_CLEANUP_OPERATIONS,
+  sparqlEndpoint: env.SPARQL_ENDPOINT,
   mayRetry: true,
 };
 
@@ -136,7 +136,7 @@ class CleanupJob {
       PREFIX mu:      <http://mu.semte.ch/vocabularies/core/>
       PREFIX dcterms: <http://purl.org/dc/terms/>
 
-      SELECT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern ?randomQuery
+      SELECT DISTINCT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern ?randomQuery
       FROM <${graph}>
       WHERE {
         ?uri a cleanup:Job ;
