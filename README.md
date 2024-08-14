@@ -28,7 +28,7 @@ The cleanup service will execute cleanup jobs that are specified in the SPARQL e
 - `cleanup:selectPattern`: the pattern to match; resource to be deleted should be named `?resource`. This is used in COUNT queries and the cleanup query (a `DELETE...WHERE` query). Needs to specified in conjunction with `cleanup:deletePattern`.
 - `cleanup:deletePattern`: the pattern to be deleted. Needs to specified in conjuntion with `cleanup:selectPattern`.
 - `cleanup:cronPattern` (optional): a cron pattern to schedule the job execution. If not provided, the default pattern will be used.
-- `cleanup:randomQuery`: If a random query just needs exection; specify the query here. Mutually exclusive with other patterns.
+- `cleanup:randomQuery`: If a random query needs exection, specify the query here. Mutually exclusive with other patterns.
 These jobs are located in `http://mu.semte.ch/graphs/public` graph, and additional migrations can be added to the migration folder of your stack or directly through your SPARQL editor.
 
 For example:
@@ -65,6 +65,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 ```
 
 Another example, which executes a random query:
+
 ```sparql
 PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
 PREFIX mu:      <http://mu.semte.ch/vocabularies/core/>

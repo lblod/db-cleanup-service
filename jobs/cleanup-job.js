@@ -33,7 +33,7 @@ class CleanupJob {
   async execute() {
     console.log(`Running cleanup job "${this.title}" (ID: ${this.id})`);
 
-    if(this.selectPattern && this.deletePattern) {
+    if (this.selectPattern && this.deletePattern) {
       let resources;
       try {
         resources = await this.matchingResources();
@@ -47,7 +47,7 @@ class CleanupJob {
         return;
       }
 
-      console.log(`Found ${resources.length} matches to remove`);
+      console.log(`Found ${resources.length} match(es) to remove.`);
 
       for (let resource of resources) {
         try {
@@ -58,11 +58,12 @@ class CleanupJob {
           console.error(e);
         }
       }
-    }
-    else {
+
+      console.log('Cleanup job done.');
+    } else {
       await this.executeRandomQuery();
+      console.log('Random query executed.');
     }
-    console.log('Cleanup job done.');
   }
 
   /**
@@ -141,13 +142,13 @@ class CleanupJob {
       WHERE {
         ?uri a cleanup:Job ;
           mu:uuid ?id ;
-          dcterms:title ?title.
+          dcterms:title ?title .
 
         {
           ?uri cleanup:selectPattern ?selectPattern ;
             cleanup:deletePattern ?deletePattern .
         } UNION {
-          ?uri cleanup:randomQuery ?randomQuery.
+          ?uri cleanup:randomQuery ?randomQuery .
         }
 
         OPTIONAL { ?uri dcterms:description ?description . }
