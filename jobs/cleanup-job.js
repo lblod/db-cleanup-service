@@ -17,6 +17,7 @@ class CleanupJob {
     description,
     selectPattern,
     deletePattern,
+    randomQuery,
     cronPattern,
   }) {
     this.id = id;
@@ -25,38 +26,49 @@ class CleanupJob {
     this.description = description;
     this.selectPattern = selectPattern;
     this.deletePattern = deletePattern;
+    this.randomQuery = randomQuery;
     this.cronPattern = cronPattern;
   }
 
   async execute() {
     console.log(`Running cleanup job "${this.title}" (ID: ${this.id})`);
 
-    let resources;
-    try {
-      resources = await this.matchingResources();
-    } catch (e) {
-      console.error('Error fetching matching resources:', e);
-      return;
-    }
-
-    if (!resources || resources.length === 0) {
-      console.warn('No resources were found.');
-      return;
-    }
-
-    console.log(`Found ${resources.length} matches to remove`);
-
-    for (let resource of resources) {
+    if (this.selectPattern && this.deletePattern) {
+      let resources;
       try {
-        console.log(`Removing resource: ${resource}`);
-        await this.removeResource(resource);
+        resources = await this.matchingResources();
       } catch (e) {
-        console.warn(`Failed to remove resource: ${resource}`);
+        console.error('Error fetching matching resources:', e);
+        return;
+      }
+
+      if (!resources || resources.length === 0) {
+        console.warn('No resources were found.');
+        return;
+      }
+
+      console.log(`Found ${resources.length} match(es) to remove.`);
+
+      for (let resource of resources) {
+        try {
+          console.log(`Removing resource: ${resource}`);
+          await this.removeResource(resource);
+        } catch (e) {
+          console.warn(`Failed to remove resource: ${resource}`);
+          console.error(e);
+        }
+      }
+
+      console.log('Cleanup job done.');
+    } else {
+      try {
+        await this.executeRandomQuery();
+        console.log('Random query executed.');
+      } catch (e) {
+        console.warn('Failed to execute random query.');
         console.error(e);
       }
     }
-
-    console.log('Cleanup job done.');
   }
 
   /**
@@ -113,20 +125,36 @@ class CleanupJob {
     }
   }
 
+  async executeRandomQuery() {
+    try {
+      console.log(`Executing random query: \n ${this.randomQuery}`);
+      await update(this.randomQuery, {}, sparqlConnectionOptions);
+    }
+    catch (e) {
+      console.error('Error executing random query: ', e);
+      throw e;
+    }
+  }
+
   static async findAll() {
     const result = await query(`
       PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
       PREFIX mu:      <http://mu.semte.ch/vocabularies/core/>
       PREFIX dcterms: <http://purl.org/dc/terms/>
 
-      SELECT DISTINCT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern
+      SELECT DISTINCT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern ?randomQuery
       FROM <${graph}>
       WHERE {
         ?uri a cleanup:Job ;
           mu:uuid ?id ;
-          dcterms:title ?title ;
-          cleanup:selectPattern ?selectPattern ;
-          cleanup:deletePattern ?deletePattern .
+          dcterms:title ?title .
+
+        {
+          ?uri cleanup:selectPattern ?selectPattern ;
+            cleanup:deletePattern ?deletePattern .
+        } UNION {
+          ?uri cleanup:randomQuery ?randomQuery .
+        }
 
         OPTIONAL { ?uri dcterms:description ?description . }
         OPTIONAL { ?uri cleanup:cronPattern ?cronPattern . }

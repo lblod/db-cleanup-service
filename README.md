@@ -25,10 +25,10 @@ services:
 The cleanup service will execute cleanup jobs that are specified in the SPARQL endpoint. Each job should have the type `cleanup:Job` and at least the following properties:
 - `mu:uuid`: an identifier for the job, typically the last part of its URI
 - `dcterms:title`: a title describing the job
-- `cleanup:selectPattern`: the pattern to match; resource to be deleted should be named `?resource`. This is used in COUNT queries and the cleanup query (a `DELETE...WHERE` query)
-- `cleanup:deletePattern`: the pattern to be deleted
+- `cleanup:selectPattern`: the pattern to match; resource to be deleted should be named `?resource`. This is used in COUNT queries and the cleanup query (a `DELETE...WHERE` query). Needs to specified in conjunction with `cleanup:deletePattern`.
+- `cleanup:deletePattern`: the pattern to be deleted. Needs to specified in conjuntion with `cleanup:selectPattern`.
 - `cleanup:cronPattern` (optional): a cron pattern to schedule the job execution. If not provided, the default pattern will be used.
-
+- `cleanup:randomQuery`: If a random query needs exection, specify the query here. Mutually exclusive with other patterns.
 These jobs are located in `http://mu.semte.ch/graphs/public` graph, and additional migrations can be added to the migration folder of your stack or directly through your SPARQL editor.
 
 For example:
@@ -51,7 +51,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
       ?source ?sourcep ?sourceo .
 
       BIND(NOW() - xsd:dayTimeDuration("P1D") AS ?oneDayAgo)
-      FILTER(?modified <= ?oneDayAgo)
+     FILTER(?modified <= ?oneDayAgo)
       FILTER(NOT EXISTS { ?foo <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#hasPart> ?resource })
     }
     """ ;
@@ -59,6 +59,26 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
     GRAPH <http://mu.semte.ch/graphs/public> {
       ?resource ?p ?o .
       ?source ?sourcep ?sourceo .
+    }
+    """;
+  cleanup:cronPattern "0 0 * * *"; # Runs daily at midnight
+```
+
+Another example, which executes a random query:
+
+```sparql
+PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
+PREFIX mu:      <http://mu.semte.ch/vocabularies/core/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+:job a cleanup:Job ;
+  mu:uuid "ecf0c526-04bb-4e16-86a2-85b5a62cb849" ;
+  dcterms:title "Flush a triple in a graph" ;
+  cleanup:randomQuery """
+    DELETE DATA {
+      GRAPH <http://a/graph/ecf0c526-04bb-4e16-86a2-85b5a62cb849> {
+        <http://ecf0c526-04bb-4e16-86a2-85b5a62cb849> <http://bar> <http://baz> .
+      }
     }
     """ ;
   cleanup:cronPattern "0 0 * * *" . # Runs daily at midnight
