@@ -2,7 +2,7 @@ import { sparqlEscapeUri } from 'mu';
 import { querySudo as query, updateSudo as update } from '@lblod/mu-auth-sudo';
 import * as env from '../env';
 
-const graph = process.env.MU_APPLICATION_GRAPH;
+const graph = env.MU_APPLICATION_GRAPH;
 
 const sparqlConnectionOptions = {
   sparqlEndpoint: env.SPARQL_ENDPOINT,

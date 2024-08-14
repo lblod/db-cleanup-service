@@ -1,7 +1,8 @@
 import cron from 'node-cron';
 import { Lock } from 'async-await-mutex-lock';
+import * as env from '../env';
 
-const defaultFrequency = process.env.CRON_PATTERN || '0 20 1 * *' ; // At 20:00 every first day of the month
+const defaultFrequency = env.CRON_PATTERN;
 const lock = new Lock();
 
 /**

@@ -5,6 +5,16 @@ export const SPARQL_ENDPOINT = envvar
   .default('http://database:8890/sparql')
   .asUrlString();
 
+export const MU_APPLICATION_GRAPH = envvar
+  .get('MU_APPLICATION_GRAPH')
+  .default('http://mu.semte.ch/graphs/public')
+  .asUrlString();
+
+export const CRON_PATTERN = envvar
+  .get('CRON_PATTERN')
+  .default('0 20 1 * *') // At 20:00 every first day of the month
+  .asString();
+
 export const PING_DB_INTERVAL = envvar
   .get('PING_DB_INTERVAL')
   .default(2) // 2 milliseconds
