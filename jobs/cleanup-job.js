@@ -61,8 +61,13 @@ class CleanupJob {
 
       console.log('Cleanup job done.');
     } else {
-      await this.executeRandomQuery();
-      console.log('Random query executed.');
+      try {
+        await this.executeRandomQuery();
+        console.log('Random query executed.');
+      } catch (e) {
+        console.warn('Failed to execute random query.');
+        console.error(e);
+      }
     }
   }
 
