@@ -17,6 +17,8 @@ services:
 | Name                        | Description                                                                   | Type      |
 | --------------------------- | ----------------------------------------------------------------------------- | ---------
 | `SPARQL_ENDPOINT`           | The endpoint that will receive SPARQL queries                                 | UrlString |
+| `MU_APPLICATION_GRAPH`      | Graph containing the cleanup jobs                                             | String    |
+| `CRON_PATTERN`              | Default cron pattern for cleanup jobs that do not define one                  | String    |
 | `PING_DB_INTERVAL`          | Interval (ms) to wait before pinging to confirm if the database is running    | Int       |
 | `SCHEDULE_ON_SERVICE_START` | Allows the cleanup jobs to be automatically scheduled when the service starts | Bool      |
 
