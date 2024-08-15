@@ -136,6 +136,12 @@ class CleanupJob {
     }
   }
 
+  /**
+   * Returns all cleanup jobs found in the database having either:
+   *  - cleanup:selectPattern AND cleanup:deletePattern properties
+   *  - a cleanup:randomQuery property
+   * @returns {CleanupJob[]} - A list of cleanup jobs
+   */
   static async findAll() {
     const result = await query(`
       PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
@@ -171,6 +177,10 @@ class CleanupJob {
     });
   }
 
+  /**
+   * @param {string} jobID - The ID of the job to be retrieved.
+   * @returns {CleanupJob} - The cleanup job having the input jobID.
+   */
   static async findJob(jobID) {
     const result = await query(`
       PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
