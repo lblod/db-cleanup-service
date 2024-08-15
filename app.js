@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { app, errorHandler } from 'mu';
 import CleanupJob from './jobs/cleanup-job';
-import scheduleCleanupJob from './jobs/schedule-cleanup-job';
+import { scheduleCleanupJob, runCleanupJob } from './jobs/schedule-cleanup-job';
 import { waitForDatabase } from './database-utils';
 import * as env from './env';
 
@@ -76,6 +76,37 @@ app.get('/disableCronjob', async function ( req, res ) {
       console.error(`Cronjob with ID: ${req.query.cronJobID} does not exist.`);
       return res.status(404).send();
     }
+  }
+});
+
+/*
+ * This is the endpoint used to run a single cronjob.
+ * Given jobs are currently defined in the database through migrations,
+ * this endpoint can be handy to quickly run and debug certain cronjobs without
+ * having to update the cron pattern in the database.
+ */
+app.get('/runCronjob', async function ( req, res ) {
+  if (Object.keys(req.query || {}).length > 1 || Object.keys(req.query || {}).length === 0) {
+    return res.status(406).send(
+      {
+        message: `Only one parameter must be passed.`
+      }
+    );
+  }
+
+  if (req.query.cronJobID) {
+    const job = await CleanupJob.findJob(req.query.cronJobID);
+    if (job) {
+      await runCleanupJob(job);
+      console.log(`Cronjob with ID: ${job.id} and title: "${job.title}" has been executed.`);
+      return res.status(200).send();
+    } else {
+      console.error(`Cronjob with ID: ${job.id} and title: "${job.title}" does not exist.`);
+      return res.status(404).send();
+    }
+  } else {
+    console.error('Parameter to be passed has to be called: cronJobID.');
+    return res.status(400).send();
   }
 });
 
