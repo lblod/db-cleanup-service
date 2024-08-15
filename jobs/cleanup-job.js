@@ -1,8 +1,8 @@
-import { sparqlEscapeUri } from 'mu';
+import { sparqlEscapeUri, sparqlEscapeString } from 'mu';
 import { querySudo as query, updateSudo as update } from '@lblod/mu-auth-sudo';
 import * as env from '../env';
 
-const graph = process.env.MU_APPLICATION_GRAPH;
+const graph = env.MU_APPLICATION_GRAPH;
 
 const sparqlConnectionOptions = {
   sparqlEndpoint: env.SPARQL_ENDPOINT,
@@ -136,6 +136,12 @@ class CleanupJob {
     }
   }
 
+  /**
+   * Returns all cleanup jobs found in the database having either:
+   *  - cleanup:selectPattern AND cleanup:deletePattern properties
+   *  - a cleanup:randomQuery property
+   * @returns {CleanupJob[]} - A list of cleanup jobs
+   */
   static async findAll() {
     const result = await query(`
       PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
@@ -169,6 +175,47 @@ class CleanupJob {
       });
       return new this(obj);
     });
+  }
+
+  /**
+   * @param {string} jobID - The ID of the job to be retrieved.
+   * @returns {CleanupJob} - The cleanup job having the input jobID.
+   */
+  static async findJob(jobID) {
+    const result = await query(`
+      PREFIX cleanup: <http://mu.semte.ch/vocabularies/ext/cleanup/>
+      PREFIX mu:      <http://mu.semte.ch/vocabularies/core/>
+      PREFIX dcterms: <http://purl.org/dc/terms/>
+
+      SELECT DISTINCT ?uri ?id ?title ?description ?selectPattern ?deletePattern ?cronPattern ?randomQuery
+      FROM <${graph}>
+      WHERE {
+        BIND(${sparqlEscapeString(jobID)} AS ?id)
+
+        ?uri a cleanup:Job ;
+          mu:uuid ?id ;
+          dcterms:title ?title .
+
+        {
+          ?uri cleanup:selectPattern ?selectPattern ;
+            cleanup:deletePattern ?deletePattern .
+        } UNION {
+          ?uri cleanup:randomQuery ?randomQuery .
+        }
+
+        OPTIONAL { ?uri dcterms:description ?description . }
+        OPTIONAL { ?uri cleanup:cronPattern ?cronPattern . }
+      }
+    `);
+    const bindingKeys = result.head.vars;
+
+    return result.results.bindings.map((r) => {
+      const obj = {};
+      bindingKeys.forEach((key) => {
+        if (r[key]) obj[key] = r[key].value;
+      });
+      return new this(obj);
+    })[0];
   }
 }
 

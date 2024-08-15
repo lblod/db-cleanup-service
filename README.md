@@ -17,6 +17,8 @@ services:
 | Name                        | Description                                                                   | Type      |
 | --------------------------- | ----------------------------------------------------------------------------- | ---------
 | `SPARQL_ENDPOINT`           | The endpoint that will receive SPARQL queries                                 | UrlString |
+| `MU_APPLICATION_GRAPH`      | Graph containing the cleanup jobs                                             | String    |
+| `CRON_PATTERN`              | Default cron pattern for cleanup jobs that do not define one                  | String    |
 | `PING_DB_INTERVAL`          | Interval (ms) to wait before pinging to confirm if the database is running    | Int       |
 | `SCHEDULE_ON_SERVICE_START` | Allows the cleanup jobs to be automatically scheduled when the service starts | Bool      |
 
@@ -145,7 +147,24 @@ This GET call accepts only one parameter.
 #### Response
 
 - `406 Not Acceptable` if no or multiple parameters were passed.
+- `400 Bad Request` if passed parameter is invalid.
 - `200 OK` if the cronjob was successfully disabled.
+
+### GET /runCronjob
+
+Manually runs a single cronjo
+
+#### Parameters
+
+This GET call accepts only one parameter.
+
+- `cronjobID`: The call in this case would be `/runCronjob?cronjobID=a53a0b8b-fdaf-41d5-a39b-20ddb3a36e6b`.
+
+#### Response
+
+- `406 Not Acceptable` if no or multiple parameters were passed.
+- `400 Bad Request` if passed parameter is invalid.
+- `200 OK` if the cronjob was successfully executed.
 
 ## Development
 

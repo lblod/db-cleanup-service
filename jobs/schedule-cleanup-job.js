@@ -1,7 +1,8 @@
 import cron from 'node-cron';
 import { Lock } from 'async-await-mutex-lock';
+import * as env from '../env';
 
-const defaultFrequency = process.env.CRON_PATTERN || '0 20 1 * *' ; // At 20:00 every first day of the month
+const defaultFrequency = env.CRON_PATTERN;
 const lock = new Lock();
 
 /**
@@ -11,7 +12,7 @@ const lock = new Lock();
  * @param {string} job.title - The title of the cleanup job
  * @param {string} job.cronPattern - The cron pattern for scheduling the cleanup job
  */
-export default function scheduleCleanupJob(job) {
+export function scheduleCleanupJob(job) {
   if (!job.title)
     throw new Error('Cleanup jobs should have a descriptive title.');
   if (!job.cronPattern) {
@@ -38,4 +39,27 @@ export default function scheduleCleanupJob(job) {
   }, {
     name: job.id
   });
+}
+
+/**
+ * Run a cleanup job after locking to ensure no other
+ * job runs simultaneously.
+ *
+ * @param {string} job - The cleanup job
+ */
+export async function runCleanupJob(job) {
+  await lock.acquire();
+  try {
+    await job.execute();
+  } catch (e) {
+    console.error(
+      new Error(
+        `Something unexpected went wrong while running cleanup job [${
+          job.title
+        }]. ${JSON.stringify(e, null, 2)}`
+      )
+    );
+  } finally {
+    lock.release();
+  }
 }
