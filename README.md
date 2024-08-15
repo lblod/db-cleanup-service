@@ -1,6 +1,6 @@
 # db-cleanup-service
 
-Microservice that removes resources matching requirements specified in the configuration.
+Microservice that runs cleanup queries (both queries matching specific patterns and random queries) at set intervals defined by a cron pattern.
 
 ## Installation
 
