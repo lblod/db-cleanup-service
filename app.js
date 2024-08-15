@@ -76,6 +76,9 @@ app.get('/disableCronjob', async function ( req, res ) {
       console.error(`Cronjob with ID: ${req.query.cronJobID} does not exist.`);
       return res.status(404).send();
     }
+  } else {
+    console.error('Parameter to be passed has to be called: cronJobID.');
+    return res.status(400).send();
   }
 });
 
