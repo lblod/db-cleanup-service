@@ -147,7 +147,24 @@ This GET call accepts only one parameter.
 #### Response
 
 - `406 Not Acceptable` if no or multiple parameters were passed.
+- `400 Bad Request` if passed parameter is invalid.
 - `200 OK` if the cronjob was successfully disabled.
+
+### GET /runCronjob
+
+Manually runs a single cronjo
+
+#### Parameters
+
+This GET call accepts only one parameter.
+
+- `cronjobID`: The call in this case would be `/runCronjob?cronjobID=a53a0b8b-fdaf-41d5-a39b-20ddb3a36e6b`.
+
+#### Response
+
+- `406 Not Acceptable` if no or multiple parameters were passed.
+- `400 Bad Request` if passed parameter is invalid.
+- `200 OK` if the cronjob was successfully executed.
 
 ## Development
 
