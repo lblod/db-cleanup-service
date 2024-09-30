@@ -1,7 +1,7 @@
 import envvar from 'env-var';
 
-export const SPARQL_ENDPOINT = envvar
-  .get('SPARQL_ENDPOINT')
+export const MU_SPARQL_ENDPOINT = envvar
+  .get('MU_SPARQL_ENDPOINT')
   .default('http://database:8890/sparql')
   .asUrlString();
 
