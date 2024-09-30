@@ -5,7 +5,7 @@ import * as env from '../env';
 const graph = env.MU_APPLICATION_GRAPH;
 
 const sparqlConnectionOptions = {
-  sparqlEndpoint: env.SPARQL_ENDPOINT,
+  sparqlEndpoint: env.MU_SPARQL_ENDPOINT,
   mayRetry: true,
 };
 
