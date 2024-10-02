@@ -14,13 +14,13 @@ services:
 
 ## Environment Variables
 
-| Name                        | Description                                                                   | Type      |
-| --------------------------- | ----------------------------------------------------------------------------- | ---------
-| `MU_SPARQL_ENDPOINT`        | The endpoint that will receive SPARQL queries                                 | UrlString |
-| `MU_APPLICATION_GRAPH`      | Graph containing the cleanup jobs                                             | UrlString |
-| `CRON_PATTERN`              | Default cron pattern for cleanup jobs that do not define one                  | String    |
-| `PING_DB_INTERVAL`          | Interval (ms) to wait before pinging to confirm if the database is running    | Int       |
-| `SCHEDULE_ON_SERVICE_START` | Allows the cleanup jobs to be automatically scheduled when the service starts | Bool      |
+| Name                        | Description                                                                   | Type      | Default value                      |
+| --------------------------- | ----------------------------------------------------------------------------- | --------- | ---------------------------------- |
+| `MU_SPARQL_ENDPOINT`        | The endpoint that will receive SPARQL queries                                 | UrlString | 'http://database:8890/sparql'      |
+| `MU_APPLICATION_GRAPH`      | Graph containing the cleanup jobs                                             | UrlString | 'http://mu.semte.ch/graphs/public' |
+| `CRON_PATTERN`              | Default cron pattern for cleanup jobs that do not define one                  | String    | '0 20 1 * *'                       |
+| `PING_DB_INTERVAL`          | Interval (sec) to wait before pinging to confirm if the database is running   | Int       | 2                                  |
+| `SCHEDULE_ON_SERVICE_START` | Allows the cleanup jobs to be automatically scheduled when the service starts | Bool      | true                               |
 
 ## Configuration
 
@@ -28,10 +28,10 @@ The cleanup service will execute cleanup jobs that are specified in the SPARQL e
 - `mu:uuid`: an identifier for the job, typically the last part of its URI
 - `dcterms:title`: a title describing the job
 - `cleanup:selectPattern`: the pattern to match; resource to be deleted should be named `?resource`. This is used in COUNT queries and the cleanup query (a `DELETE...WHERE` query). Needs to specified in conjunction with `cleanup:deletePattern`.
-- `cleanup:deletePattern`: the pattern to be deleted. Needs to specified in conjuntion with `cleanup:selectPattern`.
+- `cleanup:deletePattern`: the pattern to be deleted. Needs to specified in conjunction with `cleanup:selectPattern`.
 - `cleanup:cronPattern` (optional): a cron pattern to schedule the job execution. If not provided, the default pattern will be used.
-- `cleanup:randomQuery`: If a random query needs exection, specify the query here. Mutually exclusive with other patterns.
-These jobs are located in `http://mu.semte.ch/graphs/public` graph, and additional migrations can be added to the migration folder of your stack or directly through your SPARQL editor.
+- `cleanup:randomQuery`: If a random query needs execution, specify the query here. Mutually exclusive with other patterns.
+These jobs are located in the public graph (`http://mu.semte.ch/graphs/public`), and additional migrations can be added to the migration folder of your stack or directly through your SPARQL editor.
 
 For example:
 
@@ -142,7 +142,7 @@ Disables a single cronjob.
 
 This GET call accepts only one parameter.
 
-- `cronjobID`: The call in this case would be `/disableCronjob?cronjobID=a53a0b8b-fdaf-41d5-a39b-20ddb3a36e6b`.
+- `cronJobID`: The call in this case would be `/disableCronjob?cronJobID=a53a0b8b-fdaf-41d5-a39b-20ddb3a36e6b`.
 
 #### Response
 
@@ -152,13 +152,13 @@ This GET call accepts only one parameter.
 
 ### GET /runCronjob
 
-Manually runs a single cronjo
+Manually runs a single cronjob.
 
 #### Parameters
 
 This GET call accepts only one parameter.
 
-- `cronjobID`: The call in this case would be `/runCronjob?cronjobID=a53a0b8b-fdaf-41d5-a39b-20ddb3a36e6b`.
+- `cronJobID`: The call in this case would be `/runCronjob?cronJobID=a53a0b8b-fdaf-41d5-a39b-20ddb3a36e6b`.
 
 #### Response
 
